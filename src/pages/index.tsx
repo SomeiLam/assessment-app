@@ -1,113 +1,171 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import React, { useState } from 'react'
+// import { useForm } from 'react-hook-form'
+import { Box, Button, IconButton, Typography } from '@mui/material'
+import ANXIETY from '@/constants/anxiety'
+import {
+  ChevronRight,
+  ChevronLeft,
+  CheckCircleOutline,
+} from '@mui/icons-material'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const Home = () => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({})
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  const currentQuestion = ANXIETY.questions[currentQuestionIndex]
 
-export default function Home() {
+  const handleAnswerChange = (answer: string) => {
+    setSelectedAnswer(answer)
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQuestion.id]: answer,
+    }))
+  }
+
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < ANXIETY.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setSelectedAnswer(null) // Reset selection for the next question
+    }
+  }
+
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1)
+      setSelectedAnswer(
+        answers[ANXIETY.questions[currentQuestionIndex - 1].id] || null
+      ) // Restore previous selection
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Box className="max-w-2xl mx-auto p-20">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+        }}
+      >
+        <IconButton
+          onClick={goToPreviousQuestion}
+          sx={{
+            color: '#3f1e4b',
+          }}
+        >
+          <ChevronLeft fontSize="large" />
+        </IconButton>
+        <Typography variant="h5" sx={{ color: '#3f1e4b', fontWeight: 600 }}>
+          {currentQuestionIndex + 1} / {ANXIETY.questions.length}
+        </Typography>
+        <IconButton
+          onClick={goToPreviousQuestion}
+          sx={{
+            color: '#3f1e4b',
+          }}
+        >
+          <ChevronRight fontSize="large" />
+        </IconButton>
+      </Box>
+      <Typography
+        variant="h5"
+        sx={{
+          marginBottom: '15px',
+          textAlign: 'center',
+        }}
+      >
+        {ANXIETY.prefix}
+      </Typography>
+      <Typography
+        variant="h5"
+        sx={{
+          marginBottom: '15px',
+          textAlign: 'center',
+        }}
+      >
+        {currentQuestion.question}
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          marginTop: '10px',
+          marginBottom: '20px',
+        }}
+      >
+        {ANXIETY.options.map((option, index) => (
+          <Button
+            key={index}
+            onClick={() => handleAnswerChange(option)}
+            component="label"
+            variant="contained"
+            endIcon={<CheckCircleOutline />}
+            disableTouchRipple
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              margin: '10px 0',
+              padding: '15px 20px',
+              width: '100%',
+              color: '#3f1e4b',
+              backgroundColor:
+                selectedAnswer === option ? '#eed0f9' : '#f2eef3',
+              borderRadius: '25px',
+              textAlign: 'left',
+              fontSize: '18px',
+              fontWeight: selectedAnswer === option ? 600 : 500,
+              cursor: 'pointer',
+              textTransform: 'none',
+              boxShadow: 'none',
+              transition: 'background-color 0.5s ease-in-out',
+              '&:hover': {
+                boxShadow: '0px 0px 30px 0px rgba(209,209,209,1)',
+              },
+              '& .MuiButton-icon': {
+                '& svg': {
+                  fontSize: '25px',
+                  color: '#cb72eb',
+                  opacity: selectedAnswer === option ? 1 : 0,
+                  transform:
+                    selectedAnswer === option
+                      ? 'translateX(0)'
+                      : 'translateX(10px)',
+                  transition:
+                    'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+                },
+              },
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+            {option}
+          </Button>
+        ))}
+      </Box>
+      <div style={{ textAlign: 'center' }}>
+        <Button
+          onClick={goToNextQuestion}
+          disabled={!selectedAnswer}
+          style={{
+            width: '100px',
+            padding: '10px 20px',
+            backgroundColor: selectedAnswer ? '#cdb3e6' : '#e7e4e9',
+            color: selectedAnswer ? '#8d5aa0' : '#ccc3cf',
+            border: 'none',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            fontSize: '18px',
+            marginTop: '20px',
+            textTransform: 'none',
+            fontWeight: 600,
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+          Next
+        </Button>
+      </div>
+    </Box>
+  )
 }
+
+export default Home
