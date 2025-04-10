@@ -125,7 +125,7 @@ const MultipleChoice = () => {
           } else if (index > currentQuestionIndex) {
             transform = 'translateX(100%)' // Position next questions to the right
           }
-
+          const isCurrent = currentQuestionIndex === index
           return (
             <Box
               key={q.id}
@@ -136,23 +136,20 @@ const MultipleChoice = () => {
                 width: '100%',
                 padding: '0 20px',
                 // Control visibility and position purely with opacity and transform
-                opacity: currentQuestionIndex === index ? 1 : 0, // Target opacity
+                opacity: isCurrent ? 1 : 0, // Target opacity
                 transform: transform, // Target position
-                // Apply CSS transition for smooth movement AND fading
                 transition:
                   'transform 1.5s ease-in-out, opacity 0.8s ease-in-out',
-                // --- REMOVED 'visibility' ---
-                // Ensure non-visible elements don't intercept clicks
-                pointerEvents: currentQuestionIndex === index ? 'auto' : 'none',
-              }}
+                pointerEvents: isCurrent ? 'auto' : 'none',
+              }} // Only focusable if active
             >
               {/* Question Text */}
               <Typography
-                variant="h5" // Keep question prominent
+                variant="h5"
                 sx={{
-                  marginBottom: '25px', // More spacing
+                  marginBottom: '25px',
                   textAlign: 'center',
-                  fontWeight: 'medium', // Nicer weight
+                  fontWeight: 'medium',
                   color: '#3f1e4b',
                 }}
               >
@@ -164,19 +161,21 @@ const MultipleChoice = () => {
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '15px', // Use gap for spacing
+                  gap: '15px',
                   marginTop: '10px',
-                  marginBottom: '30px', // More spacing before button
+                  marginBottom: '30px',
                 }}
               >
                 {ANXIETY.options.map((option, optionIndex) => (
                   <Button
                     key={optionIndex}
                     onClick={() => handleAnswerChange(option)}
-                    // Removed component="label" unless using a hidden radio input
                     variant="contained"
                     endIcon={<CheckCircleOutline />}
-                    disableTouchRipple
+                    disableRipple
+                    data-value={option} // For reliable selection in focus logic
+                    data-is-answer-option="true" // For easier selection in focus logic
+                    tabIndex={isCurrent ? 0 : -1} // Only focusable if active
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -192,12 +191,10 @@ const MultipleChoice = () => {
                       cursor: 'pointer',
                       textTransform: 'none',
                       boxShadow: 'none',
-
-                      // border:
-                      //   selectedAnswer === option
-                      //     ? '2px solid #cb72eb'
-                      //     : '2px solid transparent', // Add border for selection
                       transition: 'background-color 0.5s ease', // Smooth transitions
+                      '&.Mui-focusVisible': {
+                        border: '2px solid #b47be9',
+                      },
                       '&:hover': {
                         backgroundColor:
                           selectedAnswer !== option ? '#e8e0ea' : '#eed0f9', // Subtle hover
