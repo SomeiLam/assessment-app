@@ -150,8 +150,8 @@ const Home = () => {
           style={{
             width: '100px',
             padding: '10px 20px',
-            backgroundColor: selectedAnswer ? '#cdb3e6' : '#e7e4e9',
-            color: selectedAnswer ? '#8d5aa0' : '#ccc3cf',
+            backgroundColor: selectedAnswer ? '#b47be9' : '#e7e4e9',
+            color: selectedAnswer ? '#ffffff' : '#ccc3cf',
             border: 'none',
             borderRadius: '20px',
             cursor: 'pointer',
