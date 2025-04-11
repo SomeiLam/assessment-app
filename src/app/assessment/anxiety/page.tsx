@@ -1,5 +1,5 @@
 'use client'
-import MultipleChoice from '@/components/MultipleChoice'
+import Questions from '@/components/Questions'
 import { anxiety } from '@/constants/anxiety'
 import * as motion from 'motion/react-client'
 import { useRouter } from 'next/navigation'
@@ -19,7 +19,7 @@ const AnxiteyPage = () => {
       exit={{ opacity: 0, scale: 0 }}
       transition={{ duration: 1 }}
     >
-      <MultipleChoice
+      <Questions
         questions={anxiety.questions}
         prefix={anxiety.prefix}
         customColor="blue"

@@ -23,7 +23,10 @@ const AssessmentButton: React.FC<AssessmentButtonProps> = ({
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
-        padding: '15px 20px',
+        padding: {
+          sm: '15px 20px',
+          xs: '10px 20px',
+        },
         width: '100%',
         color: color[customColor].text,
         backgroundColor: selected
@@ -56,7 +59,7 @@ const AssessmentButton: React.FC<AssessmentButtonProps> = ({
           color: color[customColor].iconColor,
           opacity: selected ? 1 : 0,
           transform: selected ? 'translateX(0)' : 'translateX(10px)',
-          transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+          transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out',
         },
       }}
     >

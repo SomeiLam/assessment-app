@@ -6,23 +6,26 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircleOutline,
-  HomeRounded,
 } from '@mui/icons-material'
 import Button from './ui/Button'
 import AssessmentButton from './ui/AssessmentButton'
+import Link from 'next/link'
 import { color } from '@/constants/colors'
+import AssessmentInput from './ui/AssessmentInput'
 
-interface MultipleChoiceProps {
+interface QuestionsProps {
   questions: { id: string; question: string; options: string[] }[]
   prefix?: string
   customColor?: 'purple' | 'blue'
+  finishText?: 'Finish' | 'Next'
   onSubmit: (answers: { [key: number]: string }) => void
 }
 
-const MultipleChoice: React.FC<MultipleChoiceProps> = ({
+const Questions: React.FC<QuestionsProps> = ({
   questions,
   prefix,
   customColor = 'purple',
+  finishText = 'Finish',
   onSubmit,
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -32,20 +35,20 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
 
   const selectedAnswer = answers[currentQuestionIndex] || null
 
-  const handleBack = () => router.push('/assessment')
-
   const handleAnswerChange = (answer: string) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
       [currentQuestionIndex]: answer,
     }))
+    setTimeout(() => {
+      if (currentQuestionIndex < questions.length - 1) goToNextQuestion()
+    }, 1000)
   }
 
   const navigateQuestions = (direction: 'next' | 'prev') => {
     const nextIndex =
       direction === 'next' ? currentQuestionIndex + 1 : currentQuestionIndex - 1
 
-    // Basic boundary checks
     if (isAnimating || nextIndex < 0 || nextIndex >= questions.length) {
       return
     }
@@ -53,7 +56,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
     setIsAnimating(true)
     setCurrentQuestionIndex(nextIndex)
 
-    const animationDuration = 500
+    const animationDuration = 1000
     setTimeout(() => {
       setIsAnimating(false)
     }, animationDuration)
@@ -62,11 +65,10 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
   const goToNextQuestion = () => navigateQuestions('next')
   const goToPreviousQuestion = () => navigateQuestions('prev')
 
-  // Determine if the next button should be enabled
-  const isNextDisabled =
-    !selectedAnswer || currentQuestionIndex === questions?.length - 1
-  const isNextButtonVisible = currentQuestionIndex < questions?.length - 1 // Hide on last question
-
+  const isFinished =
+    currentQuestionIndex === questions?.length - 1 &&
+    answers[questions?.length - 1]
+  console.log(answers[currentQuestionIndex])
   return (
     <Box className="max-w-2xl mx-auto py-10 px-5 md:p-10">
       {/* Navigation Header */}
@@ -75,58 +77,55 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '20px',
+          margin: '20px 0',
           position: 'relative', // Keep nav controls stable
           zIndex: 2, // Ensure nav is above questions during transition
         }}
       >
         <IconButton
-          onClick={
-            currentQuestionIndex === 0 ? handleBack : goToPreviousQuestion
-          }
-          disabled={isAnimating} // Disable if animating
+          onClick={goToPreviousQuestion}
+          disabled={isAnimating || currentQuestionIndex === 0}
           sx={{
             color: color[customColor].text,
             opacity: currentQuestionIndex === 0 ? 0.5 : 1, // Visual cue for disabled
           }}
         >
-          {currentQuestionIndex === 0 ? (
-            <HomeRounded fontSize="large" />
-          ) : (
-            <ChevronLeft fontSize="large" />
-          )}
+          <ChevronLeft fontSize="large" />
         </IconButton>
         <Typography
           variant="h6"
           sx={{ color: color[customColor].text, fontWeight: 600 }}
         >
-          {' '}
-          {/* Adjusted variant for better fit */}
           {currentQuestionIndex + 1} / {questions?.length}
         </Typography>
-        <IconButton
-          onClick={goToNextQuestion}
-          disabled={
-            currentQuestionIndex === questions?.length - 1 ||
-            !answers[currentQuestionIndex] ||
-            isAnimating
-          } // Disable if animating
-          sx={{
-            color: color[customColor].text,
-            opacity: currentQuestionIndex === questions?.length - 1 ? 0.5 : 1, // Visual cue for disabled
-          }}
-        >
-          <ChevronRight fontSize="large" />
-        </IconButton>
+        <Box>
+          <IconButton
+            onClick={goToNextQuestion}
+            disabled={
+              currentQuestionIndex === questions?.length - 1 ||
+              !answers[currentQuestionIndex] ||
+              isAnimating
+            } // Disable if animating
+            sx={{
+              color: color[customColor].text,
+              opacity: currentQuestionIndex === questions?.length - 1 ? 0.5 : 1, // Visual cue for disabled
+            }}
+          >
+            <ChevronRight fontSize="large" />
+          </IconButton>
+        </Box>
       </Box>
 
       {/* Prefix Text */}
       <Typography
-        variant="h6" // Adjusted variant
         sx={{
           marginBottom: '25px',
           textAlign: 'center',
           color: '#555', // Example color
+          typography: {
+            sm: 'h6',
+            xs: 'subtitle1',
+          },
         }}
       >
         {prefix}
@@ -135,7 +134,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
       <Box
         sx={{
           position: 'relative',
-          minHeight: '520px',
+          minHeight: '550px',
         }}
       >
         {questions?.map((q, index) => {
@@ -159,18 +158,22 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
                 opacity: isCurrent ? 1 : 0,
                 transform: transform,
                 transition:
-                  'transform 1s ease-in-out, opacity 1s ease-in-out, scale 1.5s ease-in-out',
+                  'transform 1.5s ease-in-out, opacity 1s ease-in-out, scale 1.5s ease-in-out',
                 pointerEvents: isCurrent ? 'auto' : 'none',
               }}
             >
               {/* Question Text */}
               <Typography
-                variant="h5"
+                // variant="h5"
                 sx={{
                   marginBottom: '25px',
                   textAlign: 'center',
                   fontWeight: 'medium',
                   color: '#3f1e4b',
+                  typography: {
+                    sm: 'h5',
+                    xs: 'h6',
+                  },
                 }}
               >
                 {q.question}
@@ -186,73 +189,63 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({
                   marginBottom: '30px',
                 }}
               >
-                {q.options.map((option) => (
-                  <AssessmentButton
-                    key={`${q.id}-${option}`}
-                    onClick={() => handleAnswerChange(option)}
-                    variant="contained"
-                    endIcon={<CheckCircleOutline />}
-                    disableRipple
-                    data-value={option} // For reliable selection in focus logic
-                    data-is-answer-option="true" // For easier selection in focus logic
-                    tabIndex={isCurrent ? 0 : -1} // Only focusable if active
-                    selected={selectedAnswer === option}
-                    option={option}
+                {q.options.length > 0 ? (
+                  q.options.map((option) => (
+                    <AssessmentButton
+                      key={`${q.id}-${option}`}
+                      onClick={() => handleAnswerChange(option)}
+                      variant="contained"
+                      endIcon={<CheckCircleOutline />}
+                      disableRipple
+                      data-value={option} // For reliable selection in focus logic
+                      data-is-answer-option="true" // For easier selection in focus logic
+                      tabIndex={isCurrent ? 0 : -1} // Only focusable if active
+                      selected={!isAnimating && selectedAnswer === option}
+                      option={option}
+                      customColor={customColor}
+                    />
+                  ))
+                ) : (
+                  <AssessmentInput
                     customColor={customColor}
+                    value={answers[currentQuestionIndex] || ''}
+                    onChange={(e) =>
+                      setAnswers((prevAnswers) => ({
+                        ...prevAnswers,
+                        [currentQuestionIndex]: e.target.value,
+                      }))
+                    }
+                    handleNext={
+                      answers[currentQuestionIndex]
+                        ? goToNextQuestion
+                        : undefined
+                    }
                   />
-                ))}
+                )}
               </Box>
+              {isFinished && (
+                <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+                  <Button
+                    onClick={() => onSubmit(answers)}
+                    disabled={!selectedAnswer || isAnimating}
+                    sx={{
+                      opacity: !isFinished || isAnimating ? 0 : 1,
+                      transition:
+                        'background-color 0.5s ease-in-out, opacity 0.5s ease-in-out',
+                      transform: transform,
+                    }}
+                    customColor={customColor}
+                  >
+                    {finishText}
+                  </Button>
+                </Box>
+              )}
             </Box>
           )
         })}
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-          {/* Next Button Area (only shown if not the last question) */}
-          {isNextButtonVisible && (
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <Button
-                onClick={goToNextQuestion}
-                disabled={isNextDisabled || isAnimating}
-                sx={{
-                  backgroundColor: !selectedAnswer
-                    ? '#e7e4e9'
-                    : color[customColor].background,
-                  color: !selectedAnswer ? '#ccc3cf' : '#ffffff',
-                  cursor:
-                    isNextDisabled || isAnimating ? 'not-allowed' : 'pointer',
-                  opacity: isAnimating ? 0.7 : 1, // Slight fade while animating
-                  transition: 'background-color 0.3s ease, opacity 0.3s ease',
-                }}
-                customColor={customColor}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-          {currentQuestionIndex === questions?.length - 1 && (
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-              <Button
-                onClick={() => onSubmit(answers)}
-                disabled={!selectedAnswer || isAnimating}
-                sx={{
-                  backgroundColor: !selectedAnswer
-                    ? '#e7e4e9'
-                    : color[customColor].background,
-                  color: !selectedAnswer ? '#ccc3cf' : '#ffffff',
-                  cursor:
-                    !selectedAnswer || isAnimating ? 'not-allowed' : 'pointer',
-                  opacity: isAnimating ? 0.7 : 1,
-                  transition: 'background-color 0.3s ease, opacity 0.3s ease',
-                }}
-                customColor={customColor}
-              >
-                Finish
-              </Button>
-            </div>
-          )}
-        </Box>
       </Box>
     </Box>
   )
 }
 
-export default MultipleChoice
+export default Questions

@@ -33,7 +33,7 @@ const Landing = () => {
         </Typography>
 
         <Box className="my-5">
-          <NavigateButton path="/assessment">Get Start</NavigateButton>
+          <NavigateButton path="/intro">Get Start</NavigateButton>
         </Box>
       </Box>
     </motion.div>
