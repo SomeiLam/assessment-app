@@ -11,8 +11,6 @@ const Page = () => {
   const [showIntro, setShowIntro] = useState(false)
   const router = useRouter()
 
-  const handleFinish = () => {}
-
   const handleSutmiit = (data: { [key: number]: string }) => {
     console.log(data)
     setShowIntro(true)

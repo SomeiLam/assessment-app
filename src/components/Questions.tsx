@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Box, IconButton, Typography } from '@mui/material'
 import {
   ChevronRight,
@@ -9,7 +8,6 @@ import {
 } from '@mui/icons-material'
 import Button from './ui/Button'
 import AssessmentButton from './ui/AssessmentButton'
-import Link from 'next/link'
 import { color } from '@/constants/colors'
 import AssessmentInput from './ui/AssessmentInput'
 
@@ -31,7 +29,6 @@ const Questions: React.FC<QuestionsProps> = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<{ [key: number]: string }>({})
   const [isAnimating, setIsAnimating] = useState(false)
-  const router = useRouter()
 
   const selectedAnswer = answers[currentQuestionIndex] || null
 

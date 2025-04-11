@@ -23,7 +23,9 @@ const AssessmentInput: React.FC<AssessmentInputProps> = ({
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        handleNext && handleNext()
+        if (handleNext) {
+          handleNext()
+        }
       }}
     >
       <MuiTextField
