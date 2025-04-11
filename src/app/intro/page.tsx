@@ -4,8 +4,7 @@ import * as motion from 'motion/react-client'
 import Questions from '@/components/Questions'
 import { intro } from '@/constants/intro'
 import { useRouter } from 'next/navigation'
-import Loading from './loading'
-import { Box } from '@mui/material'
+import Redirect from '@/components/Intro/Redirect'
 
 const Page = () => {
   const [showIntro, setShowIntro] = useState(false)
@@ -19,6 +18,10 @@ const Page = () => {
     }, 2000)
   }
 
+  if (showIntro) {
+    return <Redirect />
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -27,18 +30,12 @@ const Page = () => {
       transition={{ duration: 1 }}
       className="h-full max-w-5xl mx-auto"
     >
-      {showIntro ? (
-        <Box className="flex flex-col items-center justify-center h-full">
-          <Loading />
-        </Box>
-      ) : (
-        <Questions
-          questions={intro.questions}
-          prefix=""
-          onSubmit={handleSutmiit}
-          finishText="Next"
-        />
-      )}
+      <Questions
+        questions={intro.questions}
+        prefix=""
+        onSubmit={handleSutmiit}
+        finishText="Next"
+      />
     </motion.div>
   )
 }
